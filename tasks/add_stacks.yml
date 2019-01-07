@@ -1,0 +1,27 @@
+---
+## add a stack and set permissions
+- name: add stack
+  uri:
+    url: http://che-{{ project_name }}.{{ route_suffix }}/api/stack
+    method: POST
+    body: "{{ stack_json }}"
+    body_format: json
+    status_code: 200,201
+    headers:
+      Authorization: "Bearer {{ che_access_token_bearer }}"
+  register: stack_json_result
+
+- set_fact:
+    stack_id: "{{ stack_json_result.json|json_query('id') }}"
+
+- name: give all users access to the stack
+  uri:
+    url: http://che-{{ project_name }}.{{ route_suffix }}/api/permissions
+    method: POST
+    body: "{{ lookup('template','che-permissions.json.j2') }}"
+    body_format: json
+    status_code: 204
+    headers:
+      Authorization: "Bearer {{ che_access_token_bearer }}"
+  vars:
+    stack_id: "{{ stack_id }}"

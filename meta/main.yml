@@ -1,0 +1,15 @@
+galaxy_info:
+  role_name: openshift-codeready-workspaces
+  author: Madou Coulibaly
+  description: CodeReady Workspaces for Openshift
+  license: "license (BSD, MIT)"
+  min_ansible_version: 2.4
+  platforms:
+  - name: GenericLinux
+    versions:
+    - any
+  galaxy_tags:
+  - openshift
+  - eclipse
+  - che
+  - ide

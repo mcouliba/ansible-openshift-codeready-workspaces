@@ -1,0 +1,4 @@
+---
+# tasks file for openshift_codeready
+- include_tasks: deploy_crw.yml
+# - include_tasks: add_stacks.yml
