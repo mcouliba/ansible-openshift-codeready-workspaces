@@ -3,9 +3,10 @@
   git:
     repo: https://github.com/redhat-developer/codeready-workspaces-apb.git
     dest: codeready-workspaces-apb
+    version: operator
   tags: codeready-workspaces
 - name: Deploy CodeReady Workspaces
   shell: "./deploy.sh --deploy"
   args:
     chdir: codeready-workspaces-apb/apb/
-  tags: codeready-workspaces
+    tags: codeready-workspaces
