@@ -9,4 +9,4 @@
   shell: "./deploy.sh --deploy"
   args:
     chdir: codeready-workspaces-apb/apb/
-    tags: codeready-workspaces
+  tags: codeready-workspaces
