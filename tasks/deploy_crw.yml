@@ -7,6 +7,8 @@
   tags: codeready-workspaces
 - name: Deploy CodeReady Workspaces
   shell: "./deploy.sh --deploy"
+  register: res_cmd
+  failed_when: res_cmd.rc != 0
   args:
     chdir: codeready-workspaces-apb/apb/
   tags: codeready-workspaces
