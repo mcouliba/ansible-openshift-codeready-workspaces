@@ -6,7 +6,7 @@
     version: operator
   tags: codeready-workspaces
 - name: Deploy CodeReady Workspaces
-  shell: "./deploy.sh --deploy"
+  command: "./deploy.sh --deploy"
   register: res_cmd
   changed_when: res_cmd.rc == 0
   args:
