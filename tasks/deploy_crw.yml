@@ -4,11 +4,27 @@
     repo: https://github.com/redhat-developer/codeready-workspaces-apb.git
     dest: codeready-workspaces-apb
     version: operator
+    force: yes
   tags: codeready-workspaces
+- name: Enable TLS
+  replace:
+    path: ./codeready-workspaces-apb/apb/config.yaml
+    regexp: '(TLS_SUPPORT:).*'
+    replace: '\1 "true"'
+- name: Generate a Self Signed OpenSSL certificate
+  openssl_certificate:
+    path: codeready-ca.crt
+    privatekey_path: codeready-ca.pem
+    csr_path: codeready-ca.csr
+    provider: selfsigned
 - name: Deploy CodeReady Workspaces
-  command: "./deploy.sh --deploy"
+  command: "./deploy.sh --deploy --cert=codeready-ca.crt"
   register: res_cmd
   changed_when: res_cmd.rc == 0
   args:
     chdir: codeready-workspaces-apb/apb/
+  tags: codeready-workspaces
+- name: delete codeready project quota
+  command: "oc delete limitrange --all -n codeready"
+  ignore_errors: true
   tags: codeready-workspaces
