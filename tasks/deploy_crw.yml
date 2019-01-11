@@ -6,25 +6,39 @@
     version: operator
     force: yes
   tags: codeready-workspaces
-- name: Enable TLS
-  replace:
-    path: ./codeready-workspaces-apb/apb/config.yaml
-    regexp: '(TLS_SUPPORT:).*'
-    replace: '\1 "true"'
-- name: Generate a Self Signed OpenSSL certificate
-  openssl_certificate:
-    path: codeready-ca.crt
-    privatekey_path: codeready-ca.pem
-    csr_path: codeready-ca.csr
-    provider: selfsigned
+- name: Delete codeready project if existed
+  command: "oc delete project codeready"
+  register: res_cmd
+  changed_when: res_cmd.rc == 0
+  ignore_errors: true
+  tags: codeready-workspaces
+- name: Create codeready project
+  command: "oc new-project codeready"
+  register: res_cmd
+  changed_when: res_cmd.rc == 0
+  ignore_errors: true
+  tags: codeready-workspaces
+- name: delete codeready project quota
+  command: "oc delete limitrange --all"
+  register: res_cmd
+  changed_when: res_cmd.rc == 0
+  tags: codeready-workspaces
 - name: Deploy CodeReady Workspaces
-  command: "./deploy.sh --deploy --cert=codeready-ca.crt"
+  command: "./deploy.sh --deploy"
   register: res_cmd
   changed_when: res_cmd.rc == 0
   args:
     chdir: codeready-workspaces-apb/apb/
   tags: codeready-workspaces
-- name: delete codeready project quota
-  command: "oc delete limitrange --all -n codeready"
+- name: Disable RHSSO ssl_required for requests for realms/master
+  command: "oc rsh deployment/keycloak /opt/eap/bin/kcadm.sh update realms/master -s sslRequired=none"
+  register: res_cmd
+  changed_when: res_cmd.rc == 0
+  ignore_errors: true
+  tags: codeready-workspaces
+- name: Disable RHSSO ssl_required for requests for realms/codeready
+  command: "oc rsh deployment/keycloak /opt/eap/bin/kcadm.sh update realms/codeready -s sslRequired=none"
+  register: res_cmd
+  changed_when: res_cmd.rc == 0
   ignore_errors: true
   tags: codeready-workspaces
