@@ -23,11 +23,9 @@
   changed_when: res_cmd.rc == 0
   tags: codeready-workspaces
 - name: Deploy CodeReady Workspaces
-  command: "./deploy.sh --deploy"
+  command: "./codeready-workspaces-apb/apb/deploy.sh --deploy"
   register: res_cmd
   changed_when: res_cmd.rc == 0
-  args:
-    chdir: codeready-workspaces-apb/apb/
   tags: codeready-workspaces
 - name: Disable RHSSO ssl_required for requests for realms/master
   command: "oc rsh deployment/keycloak /opt/eap/bin/kcadm.sh update realms/master -s sslRequired=none"
