@@ -16,7 +16,6 @@
   command: "oc new-project codeready"
   register: res_cmd
   changed_when: res_cmd.rc == 0
-  ignore_errors: true
   tags: codeready-workspaces
 - name: delete codeready project quota
   command: "oc delete limitrange --all"
