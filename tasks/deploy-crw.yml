@@ -21,19 +21,19 @@
 
 - name: Deploy CodeReady Workspaces
   command: >
-        oc run \"{{ apb_pod_name }}\"
+        oc run "{{ apb_pod_name }}"
         -i
         --restart=Never
-        --image \"{{ apb_image_name }}:{{ apb_image_tag }}\"
-        --overrides=\"{
-              \\\"apiVersion\\\": \\\"v1\\\"
-              ,\\\"spec\\\": {
-                \\\"serviceAccountName\\\": \\\"codeready-workspaces-apb\\\"
+        --image "{{ apb_image_name }}:{{ apb_image_tag }}"
+        --overrides="{
+              \"apiVersion\": \"v1\"
+              ,\"spec\": {
+                \"serviceAccountName\": \"codeready-workspaces-apb\"
               }
-            }\"
-        --env=\"OPENSHIFT_TOKEN={{ oc_token }}\"
-        --env=\"OPENSHIFT_TARGET=https://kubernetes.default.svc\"
-        --env=\"POD_NAME={{ apb_pod_name }}\"
-        --env=\"POD_NAMESPACE={{ project_name }}\"
-        -- provision --extra-vars \"{{ codeready_config_content }}\"
+            }"
+        --env="OPENSHIFT_TOKEN={{ oc_token }}"
+        --env="OPENSHIFT_TARGET=https://kubernetes.default.svc"
+        --env="POD_NAME={{ apb_pod_name }}"
+        --env="POD_NAMESPACE={{ project_name }}"
+        -- provision --extra-vars "{{ codeready_config_content }}"
   changed_when: true
