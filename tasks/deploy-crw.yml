@@ -20,14 +20,14 @@
   when: cmd_result is success
 
 - name: Deploy CodeReady Workspaces
-  command: > 
+  command: >
         oc run \"{{ apb_pod_name }}\"
         -i
         --restart=Never
         --image \"{{ apb_image_name }}:{{ apb_image_tag }}\"
         --overrides=\"{
               \\\"apiVersion\\\": \\\"v1\\\"
-              ,\\\"spec\\\": { 
+              ,\\\"spec\\\": {
                 \\\"serviceAccountName\\\": \\\"codeready-workspaces-apb\\\"
               }
             }\"

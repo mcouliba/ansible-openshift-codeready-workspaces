@@ -7,8 +7,8 @@
 
 - name: create {{ project_name }} project
   command: >
-      oc new-project {{ project_name }} 
-      --display-name='{{ project_display_name }}' 
+      oc new-project {{ project_name }}
+      --display-name='{{ project_display_name }}'
       --description='{{ project_desc }}'
   when: project_result is failed
 
