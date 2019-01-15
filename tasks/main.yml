@@ -6,7 +6,10 @@
   changed_when: false
 
 - name: create {{ project_name }} project
-  command: "oc new-project {{ project_name }} --display-name='{{ project_display_name }}' --description='{{ project_desc }}'"
+  command: >
+      oc new-project {{ project_name }} 
+      --display-name='{{ project_display_name }}' 
+      --description='{{ project_desc }}'
   when: project_result is failed
 
 - name: Change Project
@@ -17,7 +20,7 @@
   command: "oc delete limitrange --all"
   register: res_cmd
   changed_when: res_cmd.rc == 0
-  
+
 - name: get Openshift Token
   command: "oc whoami -t"
   register: openshift_token
@@ -28,10 +31,12 @@
   register: cmd_result
   changed_when: true
 
-- set_fact:
+- name: init 'openshift_api_uri' variable
+  set_fact:
     openshift_api_uri: "{{ cmd_result.stdout }}"
 
-- include_tasks: deploy-crw.yml
+- name: deploy CodeReady Workspaces
+  include_tasks: deploy-crw.yml
   vars:
     oc_token: "{{ openshift_token.stdout }}"
     codeready_config_content: "{{ lookup('template', 'crw-config.json.j2', convert_data=False) }}"
@@ -41,7 +46,8 @@
   register: cmd_result
   changed_when: true
 
-- set_fact:
+- name: init 'codeready_url' variable
+  set_fact:
     codeready_url: "{{ cmd_result.stdout }}"
 
 - name: get RHSSO URL
@@ -49,7 +55,8 @@
   register: cmd_result
   changed_when: true
 
-- set_fact:
+- name: init 'rhsso_url' variable
+  set_fact:
     rhsso_url: "{{ cmd_result.stdout }}"
 
 - name: wait for CodeReady Workspaces to be running
@@ -71,9 +78,11 @@
       Content-Type: "application/x-www-form-urlencoded"
   register: codeready_access_token_result
 
-- set_fact:
+- name: init 'codeready_access_token_bearer' variable
+  set_fact:
     codeready_access_token_bearer: "{{ codeready_access_token_result.json | json_query('access_token') }}"
 
-- include_tasks: add-stack.yml
+- name: add Cloud Native Stack
+  include_tasks: add-stack.yml
   vars:
     stack_json: "{{ lookup('file','cloud-native-stack.json', convert_data=False) }}"

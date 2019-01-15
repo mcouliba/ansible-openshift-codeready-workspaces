@@ -1,13 +1,13 @@
 ---
-- name: Create Service Account for Installer
+- name: create service acccount for the apb installer
   command: "oc create sa codeready-workspaces-apb"
   register: res_cmd
   changed_when: res_cmd.rc == 0
   ignore_errors: true
 
-- name: Grant Access to the Service Account
+- name: grant cluster-admin access to the service account if Openshift OAuth enabled
   command: "oc adm policy add-cluster-role-to-user cluster-admin -z codeready-workspaces-apb"
-  when: "{{ enable_openshift_oauth }}"
+  when: enable_openshift_oauth
 
 - name: check if {{ apb_pod_name }} pod exists
   command: "oc get pod {{ apb_pod_name }}"
@@ -20,14 +20,20 @@
   when: cmd_result is success
 
 - name: Deploy CodeReady Workspaces
-  command: "oc run \"{{ apb_pod_name }}\"
-  -i
-  --restart=Never
-  --image \"{{ apb_image_name }}:{{ apb_image_tag }}\"
-  --overrides=\"{\\\"apiVersion\\\":\\\"v1\\\",\\\"spec\\\":{\\\"serviceAccountName\\\":\\\"codeready-workspaces-apb\\\"}}\"
-  --env=\"OPENSHIFT_TOKEN={{ oc_token }}\"
-  --env=\"OPENSHIFT_TARGET=https://kubernetes.default.svc\"
-  --env=\"POD_NAME={{ apb_pod_name }}\"
-  --env=\"POD_NAMESPACE={{ project_name }}\"
-  -- provision --extra-vars \"{{ codeready_config_content }}\""
+  command: > 
+        oc run \"{{ apb_pod_name }}\"
+        -i
+        --restart=Never
+        --image \"{{ apb_image_name }}:{{ apb_image_tag }}\"
+        --overrides=\"{
+              \\\"apiVersion\\\": \\\"v1\\\"
+              ,\\\"spec\\\": { 
+                \\\"serviceAccountName\\\": \\\"codeready-workspaces-apb\\\"
+              }
+            }\"
+        --env=\"OPENSHIFT_TOKEN={{ oc_token }}\"
+        --env=\"OPENSHIFT_TARGET=https://kubernetes.default.svc\"
+        --env=\"POD_NAME={{ apb_pod_name }}\"
+        --env=\"POD_NAMESPACE={{ project_name }}\"
+        -- provision --extra-vars \"{{ codeready_config_content }}\"
   changed_when: true
