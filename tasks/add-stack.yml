@@ -2,13 +2,13 @@
 ## add a stack and set permissions
 - name: add stack
   uri:
-    url: http://che-codeready.{{ route_suffix }}/api/stack
+    url: "http://{{codeready_url}}/api/stack"
     method: POST
-    body: "{{ lookup('file','cloud-native-stack.json') }}"
+    body: "{{ stack_json }}"
     status_code: 201
     body_format: json
     headers:
-      Authorization: "Bearer {{ che_codeready_token_bearer }}"
+      Authorization: "Bearer {{ codeready_access_token_bearer }}"
   register: stack_json_result
 
 - set_fact:
@@ -16,12 +16,12 @@
 
 - name: give all users access to the stack
   uri:
-    url: http://che-codeready.{{ route_suffix }}/api/permissions
+    url: "http://{{ codeready_url }}/api/permissions"
     method: POST
-    body: "{{ lookup('template','che-permissions.json.j2') }}"
+    body: "{{ lookup('template','stack-permissions.json.j2', convert_data=False) }}"
     status_code: 204
     body_format: json
     headers:
-      Authorization: "Bearer {{ che_codeready_token_bearer }}"
+      Authorization: "Bearer {{ codeready_access_token_bearer }}"
   vars:
     stack_id: "{{ stack_id }}"

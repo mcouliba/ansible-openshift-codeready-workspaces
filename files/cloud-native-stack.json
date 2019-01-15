@@ -1,4 +1,5 @@
 {
+  "id": "java-cloud-native",
   "name": "Java Cloud-Native",
   "description": "Java JDK Stack on CentOS for Cloud-Native Development",
   "scope": "general",
@@ -142,7 +143,7 @@
       "name": "OpenShift CLI"
     },
     {
-      "version": "0.0.16",
+      "version": "0.0.17",
       "name": "OpenShift DO"
     }
   ],
@@ -153,6 +154,5 @@
     "Maven",
     "CentOS",
     "Git"
-  ],
-  "id": "java-oc-centos-cloudnative"
+  ]
 }

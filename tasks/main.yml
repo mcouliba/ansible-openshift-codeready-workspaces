@@ -1,4 +1,79 @@
 ---
-# tasks file for openshift_codeready
-- include_tasks: deploy_crw.yml
-# - include_tasks: add_stacks.yml
+- name: check if {{ project_name }} project exists
+  command: "oc get project {{ project_name }}"
+  register: project_result
+  ignore_errors: true
+  changed_when: false
+
+- name: create {{ project_name }} project
+  command: "oc new-project {{ project_name }} --display-name='{{ project_display_name }}' --description='{{ project_desc }}'"
+  when: project_result is failed
+
+- name: Change Project
+  command: "oc project {{ project_name }}"
+  changed_when: true
+
+- name: delete {{ project_name }} project quota
+  command: "oc delete limitrange --all"
+  register: res_cmd
+  changed_when: res_cmd.rc == 0
+  
+- name: get Openshift Token
+  command: "oc whoami -t"
+  register: openshift_token
+  changed_when: true
+
+- name: get Openshift API URL
+  command: "oc whoami --show-server"
+  register: cmd_result
+  changed_when: true
+
+- set_fact:
+    openshift_api_uri: "{{ cmd_result.stdout }}"
+
+- include_tasks: deploy-crw.yml
+  vars:
+    oc_token: "{{ openshift_token.stdout }}"
+    codeready_config_content: "{{ lookup('template', 'crw-config.json.j2', convert_data=False) }}"
+
+- name: get CodeReady Workspaces URL
+  command: "oc get routes codeready --template={% raw %}'{{ .spec.host }}'{% endraw %}"
+  register: cmd_result
+  changed_when: true
+
+- set_fact:
+    codeready_url: "{{ cmd_result.stdout }}"
+
+- name: get RHSSO URL
+  command: "oc get routes rh-sso --template={% raw %}'{{ .spec.host }}'{% endraw %}"
+  register: cmd_result
+  changed_when: true
+
+- set_fact:
+    rhsso_url: "{{ cmd_result.stdout }}"
+
+- name: wait for CodeReady Workspaces to be running
+  uri:
+    url: "http://{{ codeready_url }}/api/system/state"
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 60
+  delay: 30
+
+- name: get auth token from RHSSO CodeReady realm
+  uri:
+    url: http://{{ rhsso_url }}/auth/realms/codeready/protocol/openid-connect/token
+    method: POST
+    body: "username=admin&password=admin&grant_type=password&client_id=admin-cli"
+    status_code: 200
+    headers:
+      Content-Type: "application/x-www-form-urlencoded"
+  register: codeready_access_token_result
+
+- set_fact:
+    codeready_access_token_bearer: "{{ codeready_access_token_result.json | json_query('access_token') }}"
+
+- include_tasks: add-stack.yml
+  vars:
+    stack_json: "{{ lookup('file','cloud-native-stack.json', convert_data=False) }}"
