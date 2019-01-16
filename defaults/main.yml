@@ -12,5 +12,6 @@ che_image_name: registry.redhat.io/codeready-workspaces-beta/server
 che_image_tag: 1.0.0.Beta1
 
 codeready_config:
+che_secure_routes: false
 enable_openshift_oauth: false
 use_self_signed_cert: false

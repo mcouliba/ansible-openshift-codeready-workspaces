@@ -35,6 +35,20 @@
   set_fact:
     openshift_api_uri: "{{ cmd_result.stdout }}"
 
+- name: create service acccount for the apb installer
+  command: "oc create sa codeready-workspaces-apb"
+  register: res_cmd
+  changed_when: res_cmd.rc == 0
+  ignore_errors: true
+
+- name: enable Openshift oAuth
+  include_tasks: oauth.yml
+  when: enable_openshift_oauth
+
+- name: enable self-signed certificate 
+  include_tasks: self-signed-cert.yml
+  when: use_self_signed_cert
+
 - name: deploy CodeReady Workspaces
   include_tasks: deploy-crw.yml
   vars:

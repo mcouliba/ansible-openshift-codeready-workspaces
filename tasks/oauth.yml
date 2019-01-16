@@ -1,0 +1,10 @@
+---
+## Self-signed certificate and OpenShift oAuth
+- name: grant cluster-admin access to the service account if Openshift oAuth enabled
+  command: "oc adm policy add-cluster-role-to-user cluster-admin -z codeready-workspaces-apb"
+  register: res_cmd
+  changed_when: res_cmd.rc == 0
+
+- name: enable SSL mode
+  set_fact:
+    use_self_signed_cert: true

@@ -1,22 +1,13 @@
 ---
-- name: create service acccount for the apb installer
-  command: "oc create sa codeready-workspaces-apb"
-  register: res_cmd
-  changed_when: res_cmd.rc == 0
-  ignore_errors: true
-
-- name: grant cluster-admin access to the service account if Openshift OAuth enabled
-  command: "oc adm policy add-cluster-role-to-user cluster-admin -z codeready-workspaces-apb"
-  when: enable_openshift_oauth
-
 - name: check if {{ apb_pod_name }} pod exists
   command: "oc get pod {{ apb_pod_name }}"
   register: cmd_result
   ignore_errors: true
-  changed_when: true
 
 - name: delete {{ apb_pod_name }} pod
   command: "oc delete pod {{ apb_pod_name }}"
+  register: res_cmd
+  changed_when: res_cmd.rc == 0
   when: cmd_result is success
 
 - name: Deploy CodeReady Workspaces
@@ -36,4 +27,5 @@
         --env="POD_NAME={{ apb_pod_name }}"
         --env="POD_NAMESPACE={{ project_name }}"
         -- provision --extra-vars "{{ codeready_config_content }}"
-  changed_when: true
+  register: res_cmd
+  changed_when: res_cmd.rc == 0
