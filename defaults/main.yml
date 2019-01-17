@@ -5,9 +5,10 @@ project_name: codeready-workspaces
 project_display_name: CodeReady Workspaces IDE
 project_desc: CodeReady Workspaces IDE based on Eclipse Che
 
-apb_pod_name: codeready-workspaces-apb-installer
-apb_image_name: registry.redhat.io/codeready-workspaces-beta/server-apb
-apb_image_tag: 1.0.0.Beta1
+operator_service_account_name: codeready-workspaces-operator
+operator_pod_name: codeready-workspaces-operator
+operator_image_name: eivantsov/che-operator
+operator_image_tag: latest
 che_image_name: registry.redhat.io/codeready-workspaces-beta/server
 che_image_tag: 1.0.0.Beta1
 

@@ -35,19 +35,26 @@
   set_fact:
     openshift_api_uri: "{{ cmd_result.stdout }}"
 
-- name: create service acccount for the apb installer
-  command: "oc create sa codeready-workspaces-apb"
+- name: create service acccount for the operator
+  command: "oc create sa {{ operator_service_account_name }}"
   register: res_cmd
   changed_when: res_cmd.rc == 0
-  ignore_errors: true
 
-- name: enable Openshift oAuth
-  include_tasks: oauth.yml
-  when: enable_openshift_oauth
+- name: grant admin role to the service acccount
+  command: >
+      oc create rolebinding {{ operator_service_account_name }} 
+      --clusterrole=admin 
+      --serviceaccount={{ project_name }}:{{ operator_service_account_name }}
+  register: res_cmd
+  changed_when: res_cmd.rc == 0
 
-- name: enable self-signed certificate 
-  include_tasks: self-signed-cert.yml
-  when: use_self_signed_cert
+# - name: enable Openshift oAuth
+#   include_tasks: oauth.yml
+#   when: enable_openshift_oauth
+
+# - name: enable self-signed certificate 
+#   include_tasks: self-signed-cert.yml
+#   when: use_self_signed_cert
 
 - name: deploy CodeReady Workspaces
   include_tasks: deploy-crw.yml
@@ -65,7 +72,7 @@
     codeready_url: "{{ cmd_result.stdout }}"
 
 - name: get RHSSO URL
-  command: "oc get routes rh-sso --template={% raw %}'{{ .spec.host }}'{% endraw %}"
+  command: "oc get routes keycloak --template={% raw %}'{{ .spec.host }}'{% endraw %}"
   register: cmd_result
   changed_when: true
 

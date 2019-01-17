@@ -1,31 +1,43 @@
 ---
-- name: check if {{ apb_pod_name }} pod exists
-  command: "oc get pod {{ apb_pod_name }}"
+- name: create ConfigMap
+  shell: "oc create -f ../templates/crw-config.yaml.j2"
+  register: res_cmd
+  changed_when: res_cmd.rc == 0
+  
+
+- name: check if {{ operator_pod_name }} pod exists
+  command: "oc get pod {{ operator_pod_name }}"
   register: cmd_result
   ignore_errors: true
 
-- name: delete {{ apb_pod_name }} pod
-  command: "oc delete pod {{ apb_pod_name }}"
+- name: delete {{ operator_pod_name }} pod
+  command: "oc delete pod {{ operator_pod_name }}"
   register: res_cmd
   changed_when: res_cmd.rc == 0
   when: cmd_result is success
 
 - name: Deploy CodeReady Workspaces
   command: >
-        oc run "{{ apb_pod_name }}"
+        oc run "{{ operator_pod_name }}"
         -i
         --restart=Never
-        --image "{{ apb_image_name }}:{{ apb_image_tag }}"
-        --overrides="{
-              \"apiVersion\": \"v1\"
-              ,\"spec\": {
-                \"serviceAccountName\": \"codeready-workspaces-apb\"
-              }
-            }"
-        --env="OPENSHIFT_TOKEN={{ oc_token }}"
-        --env="OPENSHIFT_TARGET=https://kubernetes.default.svc"
-        --env="POD_NAME={{ apb_pod_name }}"
-        --env="POD_NAMESPACE={{ project_name }}"
-        -- provision --extra-vars "{{ codeready_config_content }}"
+        --serviceaccount={{ operator_service_account_name }}
+        --image "{{ operator_image_name }}:{{ operator_image_tag }}"
+        --overrides='{
+                      "spec": {
+                        "containers": [ 
+                          { 
+                            "image": "{{ operator_image_name }}:{{ operator_image_tag }}"
+                            , "name": "che-operator"
+                            , "imagePullPolicy":"IfNotPresent"
+                            ,"envFrom":[
+                              { 
+                                "configMapRef": { 
+                                  "name": "che-operator"
+                                }
+                              }]
+                          }]
+                      }
+                    }'
   register: res_cmd
   changed_when: res_cmd.rc == 0
