@@ -35,10 +35,17 @@
   set_fact:
     openshift_api_uri: "{{ cmd_result.stdout }}"
 
+- name: check if {{ operator_service_account_name }} service account exists
+  command: "oc get sa {{ operator_service_account_name }}"
+  register: service_account_result
+  ignore_errors: true
+  changed_when: false
+
 - name: create service acccount for the operator
   command: "oc create sa {{ operator_service_account_name }}"
   register: res_cmd
   changed_when: res_cmd.rc == 0
+  when: service_account_result is failed
 
 - name: grant admin role to the service acccount
   command: >

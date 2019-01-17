@@ -1,10 +1,13 @@
 ---
+- name: get ConfigMap
+  set_fact: 
+    config_content: "{{ lookup('template', 'crw-config.yaml.j2') }} "
+
 - name: create ConfigMap
-  shell: "oc create -f ../templates/crw-config.yaml.j2"
+  shell: "echo {{ config_content | quote }} | oc create -f -"
   register: res_cmd
   changed_when: res_cmd.rc == 0
   
-
 - name: check if {{ operator_pod_name }} pod exists
   command: "oc get pod {{ operator_pod_name }}"
   register: cmd_result
