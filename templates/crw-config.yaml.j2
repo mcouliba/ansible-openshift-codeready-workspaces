@@ -26,7 +26,7 @@ data:
   CHE_TLS_SUPPORT: ""
   # PVC strategy for Che workspaces. Defaults to 'common' where all workspaces use one shared PVC
   # A 'unique' strategy implies that each workspaces gets own PVCs
-  CHE_INFRA_KUBERNETES_PVC_STRATEGY: ""
+  CHE_INFRA_KUBERNETES_PVC_STRATEGY: "unique"
   # Workspace PVC claim. Defaults to 1Gi. It is recommended to increase it when using shared PVC
   CHE_INFRA_KUBERNETES_PVC_QUANTITY: ""
   # Content of your self signed cert as string, e.g:
