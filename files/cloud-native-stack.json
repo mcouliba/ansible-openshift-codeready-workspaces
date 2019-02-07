@@ -42,7 +42,8 @@
             "installers": [
               "org.eclipse.che.exec",
               "org.eclipse.che.terminal",
-              "org.eclipse.che.ws-agent"
+              "org.eclipse.che.ws-agent",
+              "org.eclipse.che.ls.java"
             ],
             "attributes": {
               "memoryLimitBytes": "2147483648"
@@ -89,8 +90,8 @@
         }
       },
       {
-        "commandLine": "cd ${current.project.path} && java -Dswarm.http.port=9001 -jar target/*-swarm.jar ",
-        "name": "run wildfly-swarm",
+        "commandLine": "cd ${current.project.path} && java -Dswarm.http.port=9001 -jar target/*-thorntail.jar ",
+        "name": "run thorntail",
         "type": "mvn",
         "attributes": {
           "goal": "Run",
@@ -143,7 +144,7 @@
       "name": "OpenShift CLI"
     },
     {
-      "version": "0.0.17",
+      "version": "0.0.18",
       "name": "OpenShift DO"
     }
   ],
