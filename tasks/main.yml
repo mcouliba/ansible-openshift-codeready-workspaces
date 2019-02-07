@@ -67,7 +67,6 @@
   include_tasks: deploy-crw.yml
   vars:
     oc_token: "{{ openshift_token.stdout }}"
-    codeready_config_content: "{{ lookup('template', 'crw-config.json.j2', convert_data=False) }}"
 
 - name: get CodeReady Workspaces URL
   command: "oc get routes codeready --template={% raw %}'{{ .spec.host }}'{% endraw %}"
