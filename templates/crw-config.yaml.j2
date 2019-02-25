@@ -21,7 +21,7 @@ data:
   # CHE flavor. Upstream `che` or Red Hat `codeready`. Defaults to `che`
   CHE_FLAVOR: "codeready"
   # Docker image for Che server. Defaults to eclipse/che-server:latest. Keep blank unless you need to deploy your custom image
-  CHE_IMAGE: ""
+  CHE_IMAGE: "{{ codeready_image_name }}:{{ codeready_image_tag }}"
   # TLS support in Che. Defaults to false
   CHE_TLS_SUPPORT: ""
   # PVC strategy for Che workspaces. Defaults to 'common' where all workspaces use one shared PVC
@@ -37,7 +37,7 @@ data:
   # OpenShift API endpoint URL. Required only when OPENSHIFT_OAUTH is true. Auto detected
   CHE_OPENSHIFT_API_URL: ""
   # Plugin registry URL. Defaults to https://che-plugin-registry.openshift.io
-  CHE_WORKSPACE_PLUGIN__REGISTRY__URL: ""
+  CHE_WORKSPACE_PLUGIN__REGISTRY__URL: "{{ codeready_plugin_registry_url }}"
   # Ask for password update at first login as Che admin user. Defaults to true, i.e. you will be asked to update password
   CHE_UPDATE_CHE_ADMIN_PASSWORD: "false"
 
