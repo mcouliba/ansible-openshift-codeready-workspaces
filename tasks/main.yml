@@ -16,11 +16,6 @@
   command: "oc project {{ project_name }}"
   changed_when: true
 
-- name: delete {{ project_name }} project quota
-  command: "oc delete limitrange --all"
-  register: res_cmd
-  changed_when: res_cmd.rc == 0
-
 - name: get Openshift Token
   command: "oc whoami -t"
   register: openshift_token
@@ -41,7 +36,7 @@
   ignore_errors: true
   changed_when: false
 
-- name: create service acccount for the operator
+- name: create service account for the operator
   command: "oc create sa {{ operator_service_account_name }}"
   register: res_cmd
   changed_when: res_cmd.rc == 0
@@ -54,14 +49,6 @@
       --serviceaccount={{ project_name }}:{{ operator_service_account_name }}
   register: res_cmd
   changed_when: res_cmd.rc == 0
-
-# - name: enable Openshift oAuth
-#   include_tasks: oauth.yml
-#   when: enable_openshift_oauth
-
-# - name: enable self-signed certificate 
-#   include_tasks: self-signed-cert.yml
-#   when: use_self_signed_cert
 
 - name: deploy CodeReady Workspaces
   include_tasks: deploy-crw.yml
